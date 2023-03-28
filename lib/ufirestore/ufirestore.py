@@ -30,8 +30,8 @@ class INTERNAL:
       FIREBASE_GLOBAL_VAR.SLIST["SS"+id].close()
       FIREBASE_GLOBAL_VAR.SLIST["SS"+id]=None
       FIREBASE_GLOBAL_VAR.SLIST["S"+id]=None
-        
-  def put(PATH, DATA, id, cb):
+
+  def push(PATH, DATA, id, cb):
       try:
         while FIREBASE_GLOBAL_VAR.SLIST["SS"+id]:
           time.sleep(2)
@@ -41,6 +41,31 @@ class INTERNAL:
       INTERNAL.connect(id)
       LOCAL_SS=FIREBASE_GLOBAL_VAR.SLIST["SS"+id]
       LOCAL_SS.write(b"PUT /"+PATH+b".json HTTP/1.0\r\n")
+      LOCAL_SS.write(b"Host: "+FIREBASE_GLOBAL_VAR.GLOBAL_URL_ADINFO["host"]+b"\r\n")
+      LOCAL_SS.write(b"Content-Length: "+str(len(DATA))+"\r\n\r\n")
+      LOCAL_SS.write(DATA)
+      LOCAL_DUMMY=LOCAL_SS.read()
+      del LOCAL_DUMMY
+      INTERNAL.disconnect(id)
+      if cb:
+        try:
+          cb[0](*cb[1])
+        except:
+          try:
+            cb[0](cb[1])
+          except:
+            raise OSError("Callback function could not be executed. Try the function without ufirebase.py callback.")
+
+  def put(PATH, DATA, id, cb):
+      try:
+        while FIREBASE_GLOBAL_VAR.SLIST["SS"+id]:
+          time.sleep(2)
+        FIREBASE_GLOBAL_VAR.SLIST["SS"+id]=True
+      except:
+        FIREBASE_GLOBAL_VAR.SLIST["SS"+id]=True
+      INTERNAL.connect(id)
+      LOCAL_SS=FIREBASE_GLOBAL_VAR.SLIST["SS"+id]
+      LOCAL_SS.write(b"POST /"+PATH+b".json HTTP/1.0\r\n")
       LOCAL_SS.write(b"Host: "+FIREBASE_GLOBAL_VAR.GLOBAL_URL_ADINFO["host"]+b"\r\n")
       LOCAL_SS.write(b"Content-Length: "+str(len(DATA))+"\r\n\r\n")
       LOCAL_SS.write(DATA)

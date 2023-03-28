@@ -7,6 +7,6 @@ import wifi
 
 wifi.do_connect()
 
-import upip
+# import upip
 #print("installation.........")
 #upip.install("micropython-firebase-firestore")

@@ -6,7 +6,7 @@ Jaume Nogues, jnogues@gmail.com
 '''
 
 from machine import UART
-import time, struct
+import time, struct, json
 uart = UART(2,9600,tx = 13, rx = 14) #UART2, tx=gpio13 rx=gpio14
 
 count=0
@@ -22,34 +22,39 @@ def read_measures():
     fmt = '>' + (('h' if signed else 'H') * response_quantity)
     return struct.unpack(fmt, payload)
 
-def reset_energy():
-    uart.write(b'\xF8\x42\xC2\x41')#reset energy
-
-
-while True:
+def json_measures():
     try:
         #read all measures in one time
         all_measures = read_measures()
         print(all_measures)
         #split and print measues
         voltage = all_measures[0]/10.0
-        print('U = ' + str(voltage) + ' V')
+        #print('U = ' + str(voltage) + ' V')
         current = ((all_measures[2]<<16) |  (all_measures[1]))/1000.0
-        print('I = ' + str(current) + ' A')
+        #print('I = ' + str(current) + ' A')
         power = ((all_measures[4]<<16) |  (all_measures[3]))/10.0
-        print('P = ' + str(power) + 'W')
+        #print('P = ' + str(power) + 'W')
         energy = ((all_measures[6]<<16) |  (all_measures[5]))/1000.0
-        print('E = ' + str(energy) + 'kWh')
+        #print('E = ' + str(energy) + 'kWh')
         freq = all_measures[7]/10.0
-        print('freq = ' + str(freq) + ' Hz')
+        #print('freq@@@@ = ' + str(freq) + ' Hz')
         pf = all_measures[8]/10.0
-        print('power factor = ' + str(pf))
+        #print('power factor = ' + str(pf))
+        data ='{"voltage":"'+str(voltage)+'",'
+        data += '"current":"'+str(current)+'",'
+        data += '"power":"'+str(power)+'",'
+        data += '"energy":"'+str(energy)+'",'
+        data += '"frequency":"'+str(freq)+'",'
+        data += '"power_factor":"'+str(pf)+'",}'
+        d = json.loads(data)
+        return d
     except:
         #something wrong
         print('pzem04 reading error')
         
-    #delay some seconds
-    time.sleep(5)
+def reset_energy():
+    uart.write(b'\xF8\x42\xC2\x41')#reset energy
+
 
 
 

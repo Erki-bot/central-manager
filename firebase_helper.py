@@ -13,4 +13,4 @@ def test():
     doc.set("age/integerValue", 21)
     response = ufirestore.patch("users/234", doc, ["age"], False)
     print(response)
-    
+

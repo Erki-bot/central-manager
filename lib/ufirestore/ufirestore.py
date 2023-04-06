@@ -33,14 +33,14 @@ class INTERNAL:
 
   def push(PATH, DATA, id, cb):
       try:
-        while FIREBASE_GLOBAL_VAR.SLIST["SS"+id]:
-          time.sleep(2)
+        #while FIREBASE_GLOBAL_VAR.SLIST["SS"+id]:
+          #time.sleep(2)
         FIREBASE_GLOBAL_VAR.SLIST["SS"+id]=True
       except:
         FIREBASE_GLOBAL_VAR.SLIST["SS"+id]=True
       INTERNAL.connect(id)
       LOCAL_SS=FIREBASE_GLOBAL_VAR.SLIST["SS"+id]
-      LOCAL_SS.write(b"PUT /"+PATH+b".json HTTP/1.0\r\n")
+      LOCAL_SS.write(b"POST /"+PATH+b".json HTTP/1.0\r\n")
       LOCAL_SS.write(b"Host: "+FIREBASE_GLOBAL_VAR.GLOBAL_URL_ADINFO["host"]+b"\r\n")
       LOCAL_SS.write(b"Content-Length: "+str(len(DATA))+"\r\n\r\n")
       LOCAL_SS.write(DATA)
@@ -65,7 +65,7 @@ class INTERNAL:
         FIREBASE_GLOBAL_VAR.SLIST["SS"+id]=True
       INTERNAL.connect(id)
       LOCAL_SS=FIREBASE_GLOBAL_VAR.SLIST["SS"+id]
-      LOCAL_SS.write(b"POST /"+PATH+b".json HTTP/1.0\r\n")
+      LOCAL_SS.write(b"PUT /"+PATH+b".json HTTP/1.0\r\n")
       LOCAL_SS.write(b"Host: "+FIREBASE_GLOBAL_VAR.GLOBAL_URL_ADINFO["host"]+b"\r\n")
       LOCAL_SS.write(b"Content-Length: "+str(len(DATA))+"\r\n\r\n")
       LOCAL_SS.write(DATA)
@@ -244,6 +244,12 @@ def put(PATH, DATA, bg=True, id=0, cb=None):
       _thread.start_new_thread(INTERNAL.put, [PATH, ujson.dumps(DATA), str(id), cb])
     else:
       INTERNAL.put(PATH, ujson.dumps(DATA), str(id), cb)
+      
+def push(PATH, DATA, bg=True, id=0, cb=None):
+    if bg:
+      _thread.start_new_thread(INTERNAL.push, [PATH, ujson.dumps(DATA), str(id), cb])
+    else:
+      INTERNAL.push(PATH, ujson.dumps(DATA), str(id), cb)
 
 def patch(PATH, DATATAG, bg=True, id=0, cb=None):
     if bg:
@@ -274,3 +280,4 @@ def addto(PATH, DATA, DUMP=None, bg=True, id=0, cb=None):
       _thread.start_new_thread(INTERNAL.addto, [PATH, ujson.dumps(DATA), DUMP, str(id), cb])
     else:
       INTERNAL.addto(PATH, ujson.dumps(DATA), DUMP, str(id), cb)
+

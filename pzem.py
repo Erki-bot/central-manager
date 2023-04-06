@@ -16,7 +16,7 @@ def read_measures():
     uart.write(b'\xF8\x04\x00\x00\x00\x0A\x64\x64')#read all raw measures
     time.sleep(0.2)
     payload = uart.read()
-    print (payload)
+    #print (payload)
     payload = payload[3:-2]
     response_quantity = int(len(payload) / 2)
     fmt = '>' + (('h' if signed else 'H') * response_quantity)
@@ -26,7 +26,7 @@ def json_measures():
     try:
         #read all measures in one time
         all_measures = read_measures()
-        print(all_measures)
+        #print(all_measures)
         #split and print measues
         voltage = all_measures[0]/10.0
         #print('U = ' + str(voltage) + ' V')
@@ -47,14 +47,12 @@ def json_measures():
         data += '"frequency":"'+str(freq)+'",'
         data += '"power_factor":"'+str(pf)+'",}'
         d = json.loads(data)
+        
         return d
     except:
+        error_led.value(True)
         #something wrong
-        print('pzem04 reading error')
+        #print('pzem04 reading error')
         
 def reset_energy():
     uart.write(b'\xF8\x42\xC2\x41')#reset energy
-
-
-
-

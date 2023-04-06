@@ -23,7 +23,8 @@ while True:
         error_led.value(True)
         print("some error occured")
     
-    delay(0.2)
+    delay(2)
   
+
 
 
